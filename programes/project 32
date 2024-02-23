@@ -1,1 +1,54 @@
+#include <stdio.h>
+#include <limits.h>
+
+#define NUM_FRAMES 3
+#define NUM_PAGES 10
+
+int main() {
+    int pages[NUM_PAGES] = {0, 1, 2, 3, 2, 1, 0, 4, 3, 2};
+    int frames[NUM_FRAMES] = {-1, -1, -1};
+    int page_faults = 0;
+    int last_used[NUM_FRAMES] = {0};
+
+    for (int i = 0; i < NUM_PAGES; i++) {
+        int page = pages[i];
+        int found = 0;
+
+        // Check if page is already in a frame
+        for (int j = 0; j < NUM_FRAMES; j++) {
+            if (frames[j] == page) {
+                found = 1;
+                last_used[j] = i;
+                break;
+            }
+        }
+
+        // If page is not in any frame, replace the least recently used page in a frame
+        if (!found) {
+            int min_index = 0;
+            int min_last_used = INT_MAX;
+            for (int j = 0; j < NUM_FRAMES; j++) {
+                if (last_used[j] < min_last_used) {
+                    min_index = j;
+                    min_last_used = last_used[j];
+                }
+            }
+            frames[min_index] = page;
+            last_used[min_index] = i;
+            page_faults++;
+        } else {
+            // Update the last used time of the page
+            for (int j = 0; j < NUM_FRAMES; j++) {
+                if (frames[j] == page) {
+                    last_used[j] = i;
+                    break;
+                }
+            }
+        }
+    }
+
+    printf("Number of page faults: %d\n", page_faults);
+
+    return 0;
+}
 
